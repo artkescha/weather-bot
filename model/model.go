@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Weather struct {
+type ForestItem struct {
 	Dt          time.Time
 	Temperature float64
 	WindSpeed   float64
@@ -14,14 +14,14 @@ type Weather struct {
 	Icon        string
 }
 
-func (w Weather) String() string {
+func (w ForestItem) String() string {
 	date := w.Dt.Format("Jan _2 15 2006")
 	return fmt.Sprintf("%s \t %.1f %s %s", date, w.Temperature, w.Main, w.Icon)
 }
 
-type WeatherList []Weather
+type ForestList []ForestItem
 
-func (list WeatherList) String() string {
+func (list ForestList) String() string {
 	var result strings.Builder
 	prevPoint := 0
 	for _, weather := range list {
@@ -35,4 +35,10 @@ func (list WeatherList) String() string {
 
 	}
 	return result.String()
+}
+
+type Weather struct {
+	Country string
+	City    string
+	List    ForestList
 }

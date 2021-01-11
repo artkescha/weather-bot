@@ -21,24 +21,27 @@ func GetIcon(iconName string) (string, error) {
 	}
 }
 
-func ConvertWeathersToMessage(weathers []owm.Forecast5WeatherList) (WeatherList, error) {
-	result := make([]Weather, 0)
-	for index, weather := range weathers {
-		weather, err := convertWeatherToMessage(weather)
+func ConvertForestToWeather(forest *owm.Forecast5WeatherData) (Weather, error) {
+	result := make([]ForestItem, 0)
+	for index, weather := range forest.List {
+		weather, err := convertForestDataToItem(weather)
 		if err != nil {
-			return []Weather{}, fmt.Errorf("weather with index %d convert failed: %s", index, err)
+			return Weather{}, fmt.Errorf("forest item with index %d convert failed: %s", index, err)
 		}
 		result = append(result, weather)
 	}
-	return result, nil
+	return Weather{
+		Country: forest.City.Country,
+		City:    forest.City.Name,
+		List:    result}, nil
 }
 
-func convertWeatherToMessage(weather owm.Forecast5WeatherList) (Weather, error) {
+func convertForestDataToItem(weather owm.Forecast5WeatherList) (ForestItem, error) {
 	png, err := GetIcon(weather.Weather[0].Main)
 	if err != nil {
-		return Weather{}, fmt.Errorf("convert failed: %s", err)
+		return ForestItem{}, fmt.Errorf("get icon for data %s failed: %s", weather.Weather[0].Main, err)
 	}
-	return Weather{
+	return ForestItem{
 		Dt:          time.Unix(int64(weather.Dt), 0),
 		Temperature: weather.Main.Temp,
 		WindSpeed:   weather.Wind.Speed,

@@ -3,12 +3,13 @@ package main
 import (
 	"bots/telegram/weather_bot/resolver"
 	"context"
+	"fmt"
+	owm "github.com/briandowns/openweathermap"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 	"net/http"
 	"os"
 )
-
 
 func main() {
 
@@ -64,7 +65,14 @@ func main() {
 	}
 	updates := bot.ListenForWebhook("/")
 
-	resolver := resolver.New(ctx, weatherToken, updates)
+	forecast, err := owm.NewForecast("5", "C", "En", weatherToken)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("new forecast failed: %s", err))
+		return
+	}
+	weatherGetter := resolver.NewWeatherGetter(forecast)
+
+	resolver := resolver.New(ctx, weatherToken, weatherGetter, updates)
 	resolver.Start(func(chatID int64, messageID int, message string) error {
 		msg := tgbotapi.NewMessage(chatID, message)
 		msg.ReplyToMessageID = messageID

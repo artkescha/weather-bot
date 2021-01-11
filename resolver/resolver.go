@@ -61,7 +61,7 @@ func (r Resolver) getForestAndSend(update tgbotapi.Update, send func(chatID int6
 		log.Printf("get weather failed: %s", err)
 		message = "internal error: get weather failed pleas try later"
 	} else {
-		if forest.Country == "" {
+		if len(forest.List) == 0 {
 			message = fmt.Sprintf(`can't find "%s" city. Try another one, for example: "Kyiv" or "Moscow"`, update.Message.Text)
 		} else {
 			message = fmt.Sprintf("%s %s: \n%s", forest.City, forest.Country, forest.List)

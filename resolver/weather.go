@@ -24,11 +24,6 @@ func (w WeatherGetter) DailyByName(city string, days int) (model.Weather, error)
 	if !ok {
 		return model.Weather{}, fmt.Errorf("convert forecastWeatherJson to forecast5WeatherData failed %s", err)
 	}
-
-	if len(forestData.List) == 0 {
-		return model.Weather{}, fmt.Errorf("response by request city name %s is empty", city)
-	}
-
 	myWeather, err := model.ConvertForestToWeather(forestData)
 	return myWeather, nil
 }

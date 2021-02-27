@@ -23,16 +23,17 @@ type ForestList []ForestItem
 
 func (list ForestList) String() string {
 	var result strings.Builder
-	prevPoint := 0
+	prevDate := time.Time{}
 	for _, weather := range list {
-		currentPoint := weather.Dt.Day() + int(weather.Dt.Month()) + weather.Dt.Year()
-		if currentPoint > prevPoint {
+
+		currentDate := time.Date(weather.Dt.Year(), weather.Dt.Month(), weather.Dt.Day(), 0, 0, 0, 0, weather.Dt.Location())
+
+		if currentDate.Sub(prevDate) >= (24 * time.Hour) {
 			result.WriteString(fmt.Sprintf("\n%d %v\n", weather.Dt.Day(), weather.Dt.Month()))
 		}
+
 		result.WriteString(fmt.Sprintf("%s\n", weather))
-
-		prevPoint = currentPoint
-
+		prevDate = currentDate
 	}
 	return result.String()
 }

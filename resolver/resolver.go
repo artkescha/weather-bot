@@ -42,7 +42,7 @@ func (r Resolver) run(send func(chatID int64, messageID int, message string) err
 		case update := <-r.receiver:
 
 			if update.Message == nil {
-				log.Printf("imessage is nil")
+				log.Printf("message is nil")
 				continue
 			}
 			r.getForestAndSend(update, send)

@@ -1,4 +1,4 @@
-module bots/telegram/weather_bot
+module github.com/artkescha/weather-bot
 
 go 1.13
 

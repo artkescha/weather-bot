@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bots/telegram/weather_bot/resolver"
+	"github.com/artkescha/weather-bot/resolver"
 	"context"
 	"fmt"
 	owm "github.com/briandowns/openweathermap"

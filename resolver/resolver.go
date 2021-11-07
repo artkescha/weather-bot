@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"bots/telegram/weather_bot/model"
+	"github.com/artkescha/weather-bot/model"
 	owm "github.com/briandowns/openweathermap"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )

@@ -1,10 +1,11 @@
 package resolver
 
 import (
-	"bots/telegram/weather_bot/model"
 	"fmt"
-	owm "github.com/briandowns/openweathermap"
 	"log"
+
+	"github.com/artkescha/weather-bot/model"
+	owm "github.com/briandowns/openweathermap"
 )
 
 type WeatherGetter struct {

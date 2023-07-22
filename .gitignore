@@ -18,6 +18,4 @@
 docker-compose.yml
 Dockerfile
 /.idea
-# Dependency directories (remove the comment below to include it)
- vendor/
 

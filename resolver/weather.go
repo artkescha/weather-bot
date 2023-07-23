@@ -2,10 +2,9 @@ package resolver
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/artkescha/weather-bot/model"
 	owm "github.com/briandowns/openweathermap"
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type WeatherGetter struct {
@@ -26,10 +25,22 @@ func (w WeatherGetter) DailyByName(city string, days int) (model.Weather, error)
 		return model.Weather{}, fmt.Errorf("convert forecastWeatherJson to forecast5WeatherData failed %s", err)
 	}
 	myWeather, err := model.ConvertForestToWeather(forestData)
-	return myWeather, nil
+	return myWeather, err
 }
 
-func (w WeatherGetter) DailyByCoordinates(location *owm.Coordinates, days int) (model.Weather, error) {
-	log.Print("implement me later")
-	return model.Weather{}, nil
+func (w WeatherGetter) DailyByCoordinates(location *tgbotapi.Location, days int) (model.Weather, error) {
+	coordinates := &owm.Coordinates{
+		Longitude: location.Longitude,
+		Latitude:  location.Latitude,
+	}
+	err := w.foreCast.DailyByCoordinates(coordinates, days)
+	if err != nil {
+		return model.Weather{}, fmt.Errorf("get weather by request coordinates city %+v failed  %s", coordinates, err)
+	}
+	forestData, ok := w.foreCast.ForecastWeatherJson.(*owm.Forecast5WeatherData)
+	if !ok {
+		return model.Weather{}, fmt.Errorf("convert forecastWeatherJson to forecast5WeatherData failed %s", err)
+	}
+	myWeather, err := model.ConvertForestToWeather(forestData)
+	return myWeather, err
 }

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/artkescha/weather-bot/resolver"
 	"context"
 	"fmt"
+	"github.com/artkescha/weather-bot/resolver"
 	owm "github.com/briandowns/openweathermap"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
@@ -11,8 +11,12 @@ import (
 	"os"
 )
 
-func main() {
+var myCityKeyboard = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButtonLocation("My city")),
+)
 
+func main() {
 	port, exists := os.LookupEnv("PORT")
 	if !exists {
 		log.Fatalf("env PORT not exists")
@@ -49,7 +53,6 @@ func main() {
 		log.Fatalf("env BASE_URL not exists")
 		return
 	}
-
 	_, err = bot.SetWebhook(tgbotapi.NewWebhook(baseUrl))
 
 	if err != nil {
@@ -75,10 +78,14 @@ func main() {
 	resolver := resolver.New(ctx, weatherToken, weatherGetter, updates)
 	resolver.Start(func(chatID int64, messageID int, message string) error {
 		msg := tgbotapi.NewMessage(chatID, message)
+		msg.BaseChat.DisableNotification = true
 		msg.ReplyToMessageID = messageID
+		msg.ReplyMarkup = myCityKeyboard
 		_, err := bot.Send(msg)
 		return err
 	})
 
-	http.ListenAndServe("0.0.0.0:"+port, nil)
+	if err := http.ListenAndServe("0.0.0.0:"+port, nil); err != nil {
+		log.Fatalf("listen and serve with address %s failed %s", "0.0.0.0:"+port, err)
+	}
 }

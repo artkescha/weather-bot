@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/artkescha/weather-bot/model"
-	owm "github.com/briandowns/openweathermap"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Getter interface {
 	DailyByName(city string, days int) (model.Weather, error)
-	DailyByCoordinates(location *owm.Coordinates, days int) (model.Weather, error)
+	DailyByCoordinates(location *tgbotapi.Location, days int) (model.Weather, error)
 }
 
 type Resolver struct {
@@ -55,11 +55,16 @@ func (r Resolver) run(send func(chatID int64, messageID int, message string) err
 
 func (r Resolver) getForestAndSend(update tgbotapi.Update, send func(chatID int64, messageID int, message string) error) {
 	message := ""
-
-	forest, err := r.weatherGetter.DailyByName(update.Message.Text, 0)
+	if strings.Contains(update.Message.Text, "/start") {
+		if err := send(update.Message.Chat.ID, update.Message.MessageID, "click button 'My city' or send city name"); err != nil {
+			log.Printf("send message by request city name %s failed %s", update.Message.Text, err)
+		}
+		return
+	}
+	forest, err := r.weatherForecast(update.Message, 0)
 	if err != nil {
 		log.Printf("get weather failed: %s", err)
-		message = "internal error: get weather failed pleas try later"
+		message = fmt.Sprintf("get weather forecast failed, reason %s pleas try again later", err)
 	} else {
 		if len(forest.List) == 0 {
 			message = fmt.Sprintf(`can't find "%s" city. Try another one, for example: "Kyiv" or "Moscow"`, update.Message.Text)
@@ -69,5 +74,14 @@ func (r Resolver) getForestAndSend(update tgbotapi.Update, send func(chatID int6
 	}
 	if err := send(update.Message.Chat.ID, update.Message.MessageID, message); err != nil {
 		log.Printf("send message by request city name %s failed %s", update.Message.Text, err)
+	}
+}
+
+func (r Resolver) weatherForecast(message *tgbotapi.Message, days int) (model.Weather, error) {
+	switch {
+	case message.Location != nil:
+		return r.weatherGetter.DailyByCoordinates(message.Location, days)
+	default:
+		return r.weatherGetter.DailyByName(message.Text, days)
 	}
 }

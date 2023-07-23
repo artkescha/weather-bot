@@ -13,7 +13,7 @@ import (
 
 var myCityKeyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButtonLocation("My city")),
+		tgbotapi.NewKeyboardButtonLocation("🌆 My city")),
 )
 
 func main() {

@@ -3,11 +3,9 @@ package resolver
 import (
 	"context"
 	"fmt"
-	"log"
-	"strings"
-
 	"github.com/artkescha/weather-bot/model"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"log"
 )
 
 type Getter interface {
@@ -55,11 +53,14 @@ func (r Resolver) run(send func(chatID int64, messageID int, message string) err
 
 func (r Resolver) getForestAndSend(update tgbotapi.Update, send func(chatID int64, messageID int, message string) error) {
 	message := ""
-	if strings.Contains(update.Message.Text, "/start") {
-		if err := send(update.Message.Chat.ID, update.Message.MessageID, "click button 'My city' or send city name"); err != nil {
-			log.Printf("send message by request city name %s failed %s", update.Message.Text, err)
+	if update.Message.IsCommand() {
+		switch update.Message.Command() {
+		case "start":
+			if err := send(update.Message.Chat.ID, update.Message.MessageID, "click button 'My city' or send city name"); err != nil {
+				log.Printf("send message by request city name %s failed %s", update.Message.Text, err)
+			}
+			return
 		}
-		return
 	}
 	forest, err := r.weatherForecast(update.Message, 0)
 	if err != nil {
